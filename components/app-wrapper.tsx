@@ -28,7 +28,7 @@ export function AppWrapper() {
         }
       } catch (error) {
         // Permissions API not supported, start from permissions screen
-        console.log("Permissions API not supported")
+        console.log("Permissions API not supported", error)
       }
     }
 

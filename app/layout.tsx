@@ -5,7 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Digital Lawyer - Legal Assistant PWA",
+  title: "Digital Lawyer - AI Legal Assistant",
   description: "Your digital legal help provider with AI assistance and incident capture",
   generator: "v0.app",
   manifest: "/manifest.json",

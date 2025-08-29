@@ -51,7 +51,7 @@ export function HomeScreen() {
               </div>
               <div>
                 <h1 className="text-xl font-bold">Digital Lawyer</h1>
-                <p className="text-sm text-muted-foreground">Legal Assistant PWA</p>
+                <p className="text-sm text-muted-foreground">AI Legal Assistant</p>
               </div>
             </div>
 
