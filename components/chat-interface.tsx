@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-import type { SpeechRecognition } from "web-speech-api"
 
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
@@ -9,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ArrowLeft, Send, Paperclip, Scale, Bot, User, AlertCircle, Mic, MicOff, Volume2, VolumeX } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { generateLegalResponse } from "@/models/generate-response"
+import { AIResponse } from "@/components/ai-response"
 
 interface Message {
   id: string
@@ -38,7 +39,7 @@ export function ChatInterface({ onBack }: ChatInterfaceProps) {
   const [attachments, setAttachments] = useState<File[]>([])
   const [isRecording, setIsRecording] = useState(false)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
-  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null)
+  const [recognition, setRecognition] = useState<any>(null) // eslint-disable-line @typescript-eslint/no-explicit-any
   const [recordingText, setRecordingText] = useState("")
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null)
   const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null)
@@ -55,7 +56,7 @@ export function ChatInterface({ onBack }: ChatInterfaceProps) {
         recognitionInstance.interimResults = true
         recognitionInstance.lang = "en-US"
 
-        recognitionInstance.onresult = (event) => {
+        recognitionInstance.onresult = (event: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
           let finalTranscript = ""
           let interimTranscript = ""
 
@@ -81,7 +82,7 @@ export function ChatInterface({ onBack }: ChatInterfaceProps) {
           setRecordingText("")
         }
 
-        recognitionInstance.onerror = (event) => {
+        recognitionInstance.onerror = (event: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
           console.error("Speech recognition error:", event.error)
           setIsRecording(false)
           setRecordingText("")
@@ -160,8 +161,8 @@ export function ChatInterface({ onBack }: ChatInterfaceProps) {
     setIsLoading(true)
 
     try {
-      // Simulate AI response - In production, this would call HuggingFace API
-      const aiResponse = await simulateAIResponse(inputValue, attachments)
+      // Use the actual AI response function
+      const aiResponse = await generateLegalResponse(inputValue, attachments)
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -172,6 +173,7 @@ export function ChatInterface({ onBack }: ChatInterfaceProps) {
 
       setMessages((prev) => [...prev, aiMessage])
     } catch (error) {
+      console.error("Error generating AI response:", error)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: "I apologize, but I'm having trouble processing your request right now. Please try again in a moment.",
@@ -182,32 +184,6 @@ export function ChatInterface({ onBack }: ChatInterfaceProps) {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const simulateAIResponse = async (input: string, files: File[]): Promise<string> => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 2000))
-
-    // Simple response logic - in production, this would use HuggingFace API
-    const lowerInput = input.toLowerCase()
-
-    if (lowerInput.includes("accident") || lowerInput.includes("incident")) {
-      return "In case of an accident, your immediate priorities should be: 1) Ensure everyone's safety and call emergency services if needed, 2) Document the scene with photos and gather witness information, 3) Exchange insurance information with other parties, 4) Contact your insurance company, and 5) Consider consulting with a personal injury attorney if there are injuries or significant damages. Remember, this is general guidance and specific situations may require different approaches."
-    }
-
-    if (lowerInput.includes("contract") || lowerInput.includes("agreement")) {
-      return "When reviewing contracts, pay attention to: 1) Key terms like payment schedules, deliverables, and deadlines, 2) Termination clauses and penalties, 3) Liability and indemnification provisions, 4) Dispute resolution mechanisms, and 5) Any unusual or concerning language. Always have important contracts reviewed by a qualified attorney before signing."
-    }
-
-    if (lowerInput.includes("divorce") || lowerInput.includes("custody")) {
-      return "Family law matters like divorce and custody are complex and emotionally challenging. Key considerations include: 1) Asset division and financial support, 2) Child custody and visitation arrangements, 3) Documentation of income and assets, 4) Mediation vs. litigation options. I strongly recommend consulting with a family law attorney who can provide personalized guidance based on your specific situation and local laws."
-    }
-
-    if (files.length > 0) {
-      return `I can see you've uploaded ${files.length} file(s). While I can provide general guidance about document types and common legal considerations, I cannot actually read or analyze the specific content of your documents. For detailed document review, please consult with a qualified attorney who can properly examine your materials and provide specific advice.`
-    }
-
-    return "Thank you for your question. While I can provide general legal information, every situation is unique and may have specific legal implications. I recommend consulting with a qualified attorney who can review the details of your particular case and provide personalized legal advice. Is there a specific area of law you'd like me to provide general information about?"
   }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -324,7 +300,11 @@ export function ChatInterface({ onBack }: ChatInterfaceProps) {
                     </div>
                   )}
 
-                  <p className="text-sm leading-relaxed">{message.content}</p>
+                  {message.sender === "ai" ? (
+                    <AIResponse content={message.content} className="text-sm" />
+                  ) : (
+                    <p className="text-sm leading-relaxed">{message.content}</p>
+                  )}
 
                   {message.isAudio && (
                     <div className="text-xs opacity-75 flex items-center gap-1 mt-1">

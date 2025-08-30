@@ -48,7 +48,7 @@ export function IncidentCapture({ onBack }: IncidentCaptureProps) {
   const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([])
 
   const videoRef = useRef<HTMLVideoElement>(null)
-  const recognitionRef = useRef<any>(null)
+  const recognitionRef = useRef<SpeechRecognition | null>(null)
   const { toast } = useToast()
 
   // Load emergency contacts
@@ -93,6 +93,7 @@ export function IncidentCapture({ onBack }: IncidentCaptureProps) {
 
   // Initialize speech recognition
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
 
     if (SpeechRecognition) {
@@ -102,7 +103,7 @@ export function IncidentCapture({ onBack }: IncidentCaptureProps) {
       recognition.interimResults = true
       recognition.lang = "en-US"
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         let finalTranscript = ""
         let interimTranscript = ""
 
@@ -121,7 +122,7 @@ export function IncidentCapture({ onBack }: IncidentCaptureProps) {
         setCurrentSubtitle(interimTranscript)
       }
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error("Speech recognition error:", event.error)
         toast({
           title: "Speech Recognition Error",
