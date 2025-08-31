@@ -306,13 +306,6 @@ export function ChatInterface({ onBack }: ChatInterfaceProps) {
                     <p className="text-sm leading-relaxed">{message.content}</p>
                   )}
 
-                  {message.isAudio && (
-                    <div className="text-xs opacity-75 flex items-center gap-1 mt-1">
-                      <Mic className="h-3 w-3" />
-                      Voice message
-                    </div>
-                  )}
-
                   {message.attachments && message.attachments.length > 0 && (
                     <div className="mt-2 space-y-1">
                       {message.attachments.map((file, index) => (
