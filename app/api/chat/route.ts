@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { orchestrateResponse, checkModelAvailability } from "../../../lib/model-orchestrator";
 import { ImageData, isValidImageFormat } from "../../../lib/image-utils";
+import { getModelConfig, isProviderConfigured } from "../../../lib/model-config";
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,24 +27,45 @@ export async function POST(request: NextRequest) {
     
     const otherAttachments = attachments || [];
     
-    const modelCheck = await checkModelAvailability();
-    if (processedImages.length > 0 && !modelCheck.llava) {
+    // Check model configuration and availability
+    const config = getModelConfig();
+    console.log(`API: Using provider ${config.provider}`);
+    
+    if (!isProviderConfigured(config)) {
       return NextResponse.json(
         { 
           success: false, 
-          error: "LLaVA:7b model not available. Please install it with: ollama pull llava:7b" 
+          error: `${config.provider} provider is not properly configured. Please check your API keys and environment variables.` 
         },
         { status: 503 }
       );
     }
-    if (!modelCheck.gemma) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: "Gemma3:4b model not available. Please install it with: ollama pull gemma3:4b" 
-        },
-        { status: 503 }
-      );
+    
+    const modelCheck = await checkModelAvailability();
+    if (modelCheck.errors.length > 0) {
+      console.warn("Model availability issues:", modelCheck.errors);
+      // For cloud providers, we may still proceed if there are warnings
+      // but fail if no models are available at all
+      if (!modelCheck.gemma && !modelCheck.llava) {
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: `No models available. Issues: ${modelCheck.errors.join(', ')}` 
+          },
+          { status: 503 }
+        );
+      }
+      
+      // If we have images but no vision model, inform the user
+      if (processedImages.length > 0 && !modelCheck.llava) {
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: `Vision model not available for image analysis. Issues: ${modelCheck.errors.join(', ')}` 
+          },
+          { status: 503 }
+        );
+      }
     }
     
     const result = await orchestrateResponse(

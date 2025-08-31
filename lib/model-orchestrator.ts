@@ -1,5 +1,6 @@
-import ollama from "ollama";
 import { ImageData } from "./image-utils";
+import { createFallbackProvider } from "./model-providers/provider-factory";
+import { BaseModelProvider, ModelMessage } from "./model-providers/base-provider";
 
 export interface ModelResponse {
   success: boolean;
@@ -8,32 +9,36 @@ export interface ModelResponse {
   model_used?: string;
 }
 
-export async function analyzeImageWithLLaVA(
+// Global provider instance - initialized once per request
+let currentProvider: BaseModelProvider | null = null;
+
+async function getProvider(): Promise<BaseModelProvider> {
+  if (!currentProvider) {
+    currentProvider = await createFallbackProvider();
+  }
+  return currentProvider;
+}
+
+export async function analyzeImageWithProvider(
   imageData: ImageData, 
   userPrompt: string
 ): Promise<string> {
   try {
-    const prompt = `Please analyze this image and provide a detailed description. Context from user: ${userPrompt}`;
+    const provider = await getProvider();
+    const result = await provider.analyzeImage(imageData, userPrompt);
     
-    const result = await ollama.chat({
-      model: "llava:7b",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-          images: [imageData.base64]
-        }
-      ]
-    });
-
-    return result.message.content;
+    if (!result.success) {
+      throw new Error(result.error || 'Image analysis failed');
+    }
+    
+    return result.content || '';
   } catch (error) {
-    console.error("Error with LLaVA analysis:", error);
-    throw new Error(`Failed to analyze image with LLaVA: ${error}`);
+    console.error("Error with image analysis:", error);
+    throw new Error(`Failed to analyze image: ${error}`);
   }
 }
 
-export async function generateResponseWithGemma(
+export async function generateResponseWithProvider(
   userInput: string, 
   imageAnalysis?: string,
   attachmentInfo?: { name: string; size: number; type: string }[]
@@ -52,7 +57,7 @@ export async function generateResponseWithGemma(
       userMessage += `\n\nNote: The user has also uploaded ${attachmentInfo.length} file(s): ${attachmentInfo.map(f => f.name).join(', ')}`;
     }
 
-    const messages = [
+    const messages: ModelMessage[] = [
       {
         role: "system",
         content: systemPrompt
@@ -63,17 +68,23 @@ export async function generateResponseWithGemma(
       }
     ];
 
-    const result = await ollama.chat({
-      model: "gemma3:4b",
-      messages
-    });
+    const provider = await getProvider();
+    const result = await provider.generateText(messages);
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Text generation failed');
+    }
 
-    return result.message.content;
+    return result.content || '';
   } catch (error) {
-    console.error("Error with Gemma generation:", error);
-    throw new Error(`Failed to generate response with Gemma: ${error}`);
+    console.error("Error with text generation:", error);
+    throw new Error(`Failed to generate response: ${error}`);
   }
 }
+
+// Legacy function names for backward compatibility
+export const analyzeImageWithLLaVA = analyzeImageWithProvider;
+export const generateResponseWithGemma = generateResponseWithProvider;
 
 export async function orchestrateResponse(
   userInput: string,
@@ -81,13 +92,16 @@ export async function orchestrateResponse(
   otherAttachments: { name: string; size: number; type: string }[]
 ): Promise<ModelResponse> {
   try {
+    const provider = await getProvider();
+    console.log(`Using provider: ${provider.name}`);
+    
     let imageAnalysis: string = "";
     
     if (images.length > 0) {
-      console.log(`Processing ${images.length} image(s) with LLaVA:7b`);
+      console.log(`Processing ${images.length} image(s) with vision model`);
       
       const analysisPromises = images.map(async (image, index) => {
-        const analysis = await analyzeImageWithLLaVA(image, userInput);
+        const analysis = await analyzeImageWithProvider(image, userInput);
         return `Image ${index + 1} (${image.fileName}): ${analysis}`;
       });
       
@@ -95,14 +109,16 @@ export async function orchestrateResponse(
       imageAnalysis = analyses.join("\n\n");
     }
     
-    console.log("Generating response with Gemma3:4b");
-    const finalResponse = await generateResponseWithGemma(
+    console.log("Generating response with text model");
+    const finalResponse = await generateResponseWithProvider(
       userInput, 
       imageAnalysis || undefined,
       otherAttachments.length > 0 ? otherAttachments : undefined
     );
     
-    const modelUsed = images.length > 0 ? "LLaVA:7b + Gemma3:4b" : "Gemma3:4b";
+    const modelUsed = images.length > 0 ? 
+      `${provider.name} (Vision + Text)` : 
+      `${provider.name} (Text)`;
     
     return {
       success: true,
@@ -118,32 +134,26 @@ export async function orchestrateResponse(
     };
   }
 }
+
 export async function checkModelAvailability(): Promise<{
   llava: boolean;
   gemma: boolean;
   errors: string[];
 }> {
-  const errors: string[] = [];
-  let llava = false;
-  let gemma = false;
-  
   try {
-    const models = await ollama.list();
-    const modelNames = models.models.map(m => m.name);
+    const provider = await getProvider();
+    const availability = await provider.checkAvailability();
     
-    llava = modelNames.some(name => name.includes('llava') && name.includes('7b'));
-    gemma = modelNames.some(name => name.includes('gemma3') && name.includes('4b'));
-    
-    if (!llava) {
-      errors.push("LLaVA:7b model not found. Please run: ollama pull llava:7b");
-    }
-    if (!gemma) {
-      errors.push("Gemma3:4b model not found. Please run: ollama pull gemma3:4b");
-    }
-    
+    return {
+      llava: availability.visionModel,
+      gemma: availability.textModel,
+      errors: availability.errors
+    };
   } catch (error) {
-    errors.push(`Failed to check model availability: ${error}`);
+    return {
+      llava: false,
+      gemma: false,
+      errors: [`Failed to check model availability: ${error}`]
+    };
   }
-  
-  return { llava, gemma, errors };
 }
