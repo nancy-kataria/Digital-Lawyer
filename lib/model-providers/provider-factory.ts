@@ -1,5 +1,6 @@
 import { BaseModelProvider } from "./base-provider";
 import { OllamaProvider } from "./ollama-provider";
+import { MockProvider } from "./mock-provider";
 import { ModelConfig, getModelConfig } from "../model-config";
 
 export function createModelProvider(config?: ModelConfig): BaseModelProvider {
@@ -9,6 +10,8 @@ export function createModelProvider(config?: ModelConfig): BaseModelProvider {
     case 'ollama-local':
     case 'ollama-remote':
       return new OllamaProvider(modelConfig);
+    case 'mock':
+      return new MockProvider(modelConfig);
     default:
       throw new Error(`Unknown provider: ${modelConfig.provider}`);
   }

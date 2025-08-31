@@ -1,4 +1,4 @@
-export type ModelProvider = 'ollama-local' | 'ollama-remote';
+export type ModelProvider = 'ollama-local' | 'ollama-remote' | 'mock';
 
 export interface ModelConfig {
   provider: ModelProvider;
@@ -12,7 +12,7 @@ export interface ProviderConfig {
   [key: string]: ModelConfig;
 }
 
-// Default configurations for Ollama providers
+// Default configurations for providers
 export const PROVIDER_CONFIGS: ProviderConfig = {
   'ollama-local': {
     provider: 'ollama-local',
@@ -26,6 +26,12 @@ export const PROVIDER_CONFIGS: ProviderConfig = {
     visionModel: 'llava:7b',
     apiUrl: process.env.OLLAMA_API_URL || 'http://localhost:11434',
     description: 'Remote Ollama instance'
+  },
+  'mock': {
+    provider: 'mock',
+    textModel: 'Mock Legal AI',
+    visionModel: 'Mock Vision AI',
+    description: 'Mock AI for demo/testing'
   }
 };
 
@@ -45,12 +51,17 @@ export function getModelProvider(): ModelProvider {
     return manualProvider;
   }
   
-  // Use remote Ollama if URL is provided or if hosted
-  if (remoteOllamaUrl || isHosted) {
+  // Use remote Ollama if URL is explicitly provided
+  if (remoteOllamaUrl) {
     return 'ollama-remote';
   }
   
-  // Default to local Ollama
+  // Use mock mode for hosted environments without remote Ollama
+  if (isHosted) {
+    return 'mock';
+  }
+  
+  // Default to local Ollama for development
   return 'ollama-local';
 }
 
@@ -76,6 +87,11 @@ export function isProviderConfigured(config: ModelConfig): boolean {
   // Remote Ollama needs a URL
   if (config.provider === 'ollama-remote') {
     return !!config.apiUrl;
+  }
+  
+  // Mock provider is always configured
+  if (config.provider === 'mock') {
+    return true;
   }
   
   return false;
