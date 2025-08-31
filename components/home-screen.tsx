@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { MessageSquare, Camera, Scale, Shield, Users, Settings, Phone } from "lucide-react"
@@ -70,9 +71,11 @@ export function HomeScreen() {
           <div className="text-center space-y-6">
             <div className="relative mx-auto mb-8">
               <div className="relative mx-auto w-48 h-48 md:w-56 md:h-56 rounded-full bg-gradient-to-br from-accent/10 to-accent/5 p-4 shadow-lg">
-                <img
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/lawnorder-hAHxZA0QkIlesCzdtPthB9sUS89NqN.jpeg"
+                <Image
+                  src="/lawnorder.jpeg"
                   alt="Lady Justice - Symbol of Legal Authority"
+                  width={224}
+                  height={224}
                   className="w-full h-full object-cover rounded-full shadow-md"
                 />
                 <div className="absolute inset-0 rounded-full bg-gradient-to-t from-primary/10 to-transparent"></div>

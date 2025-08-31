@@ -35,7 +35,7 @@ export async function createFallbackProvider(): Promise<BaseModelProvider> {
         return primaryProvider; // Return primary even if it has issues
       }
       
-      const fallbackConfig = { 
+      const fallbackConfig: ModelConfig = { 
         ...config, 
         provider: fallbackProvider,
         description: fallbackProvider === 'ollama-local' ? 'Local Ollama instance' : 'Remote Ollama instance',

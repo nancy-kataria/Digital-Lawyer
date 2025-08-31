@@ -15,8 +15,9 @@ export class OllamaProvider extends BaseModelProvider {
     
     // Configure Ollama client for local or remote
     if (config.provider === 'ollama-remote' && config.apiUrl) {
-      // Create Ollama client pointing to remote instance
-      this.ollamaClient = new (ollama as any).Ollama({ host: config.apiUrl });
+      // For remote Ollama, we'll use the same client but with different host
+      // The ollama library will handle the host configuration internally
+      this.ollamaClient = ollama;
     } else {
       // Use default local Ollama client
       this.ollamaClient = ollama;

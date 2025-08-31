@@ -14,46 +14,49 @@ export function AIResponse({ content, className }: AIResponseProps) {
         remarkPlugins={[remarkGfm]}
         components={{
           // Headings - optimized for chat bubbles
-          h1: ({ node, ...props }) => (
+          h1: (props) => (
             <h1 className="text-lg font-bold mb-3 mt-2 first:mt-0" {...props} />
           ),
-          h2: ({ node, ...props }) => (
+          h2: (props) => (
             <h2 className="text-base font-semibold mb-2 mt-3 first:mt-0" {...props} />
           ),
-          h3: ({ node, ...props }) => (
+          h3: (props) => (
             <h3 className="text-sm font-medium mb-2 mt-2 first:mt-0" {...props} />
           ),
-          h4: ({ node, ...props }) => (
+          h4: (props) => (
             <h4 className="text-sm font-medium mb-1 mt-2 first:mt-0" {...props} />
           ),
           
           // Paragraphs
-          p: ({ node, ...props }) => (
+          p: (props) => (
             <p className="text-gray-700 mb-3 leading-relaxed" {...props} />
           ),
           
           // Lists
-          ul: ({ node, ...props }) => (
+          ul: (props) => (
             <ul className="list-disc pl-5 mb-4 space-y-1" {...props} />
           ),
-          ol: ({ node, ...props }) => (
+          ol: (props) => (
             <ol className="list-decimal pl-5 mb-4 space-y-1" {...props} />
           ),
-          li: ({ node, ...props }) => (
+          li: (props) => (
             <li className="text-gray-700 leading-relaxed" {...props} />
           ),
           
           // Text formatting
-          strong: ({ node, ...props }) => (
+          strong: (props) => (
             <strong className="font-semibold text-gray-900" {...props} />
           ),
-          em: ({ node, ...props }) => (
+          em: (props) => (
             <em className="italic text-gray-800" {...props} />
           ),
           
           // Code
-          code: ({ node, inline, ...props }) => {
-            if (inline) {
+          code: ({ ...props }) => {
+            // Type assertion to access the inline property safely
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const codeProps = props as any;
+            if (codeProps.inline) {
               return (
                 <code 
                   className="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm font-mono" 
@@ -68,12 +71,12 @@ export function AIResponse({ content, className }: AIResponseProps) {
               />
             );
           },
-          pre: ({ node, ...props }) => (
+          pre: (props) => (
             <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4" {...props} />
           ),
           
           // Links
-          a: ({ node, ...props }) => (
+          a: (props) => (
             <a 
               className="text-blue-600 hover:text-blue-800 underline" 
               target="_blank" 
@@ -83,7 +86,7 @@ export function AIResponse({ content, className }: AIResponseProps) {
           ),
           
           // Blockquotes
-          blockquote: ({ node, ...props }) => (
+          blockquote: (props) => (
             <blockquote 
               className="border-l-4 border-blue-500 pl-4 italic text-gray-600 my-4 bg-blue-50 py-2" 
               {...props} 
@@ -91,20 +94,20 @@ export function AIResponse({ content, className }: AIResponseProps) {
           ),
           
           // Tables (if needed)
-          table: ({ node, ...props }) => (
+          table: (props) => (
             <div className="overflow-x-auto mb-4">
               <table className="min-w-full border-collapse border border-gray-300" {...props} />
             </div>
           ),
-          th: ({ node, ...props }) => (
+          th: (props) => (
             <th className="border border-gray-300 bg-gray-50 px-3 py-2 text-left font-semibold" {...props} />
           ),
-          td: ({ node, ...props }) => (
+          td: (props) => (
             <td className="border border-gray-300 px-3 py-2" {...props} />
           ),
           
           // Horizontal rule
-          hr: ({ node, ...props }) => (
+          hr: (props) => (
             <hr className="my-6 border-gray-300" {...props} />
           ),
         }}
