@@ -1,34 +1,71 @@
-import ollama from "ollama";
 import { NextRequest, NextResponse } from "next/server";
+import { orchestrateResponse, checkModelAvailability } from "../../../lib/model-orchestrator";
+import { ImageData, isValidImageFormat } from "../../../lib/image-utils";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userInput, attachments } = await request.json();
+    const { userInput, images, attachments } = await request.json();
     
-    const messages = [
-      {
-        role: "system",
-        content: "You are a helpful legal assistant AI. Provide general legal information and guidance, but always remind users to consult with a qualified attorney for specific legal advice. Be helpful, accurate, and professional."
-      },
-      {
-        role: "user",
-        content: userInput,
-      },
-    ];
-
-    // If there are attachments, mention them in the prompt
-    if (attachments && attachments.length > 0) {
-      messages[1].content += `\n\nNote: The user has uploaded ${attachments.length} file(s): ${attachments.map((f: { name: string }) => f.name).join(', ')}`;
+    if (!userInput || typeof userInput !== 'string') {
+      return NextResponse.json(
+        { success: false, error: "User input is required" },
+        { status: 400 }
+      );
     }
-
-    const result = await ollama.chat({
-      model: "gemma3:4b",
-      messages,
-    });
-
-    return NextResponse.json({ 
-      success: true, 
-      response: result.message.content 
+    
+    const processedImages: ImageData[] = [];
+    if (images && Array.isArray(images)) {
+      for (const imageData of images) {
+        if (!isValidImageFormat(imageData.mimeType)) {
+          console.warn(`Unsupported image format: ${imageData.mimeType}`);
+          continue;
+        }
+        processedImages.push(imageData);
+      }
+    }
+    
+    const otherAttachments = attachments || [];
+    
+    const modelCheck = await checkModelAvailability();
+    if (processedImages.length > 0 && !modelCheck.llava) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: "LLaVA:7b model not available. Please install it with: ollama pull llava:7b" 
+        },
+        { status: 503 }
+      );
+    }
+    if (!modelCheck.gemma) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: "Gemma3:4b model not available. Please install it with: ollama pull gemma3:4b" 
+        },
+        { status: 503 }
+      );
+    }
+    
+    const result = await orchestrateResponse(
+      userInput,
+      processedImages,
+      otherAttachments
+    );
+    
+    if (!result.success) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: result.error || "Failed to generate response" 
+        },
+        { status: 500 }
+      );
+    }
+    
+    return NextResponse.json({
+      success: true,
+      response: result.response,
+      model_used: result.model_used
     });
     
   } catch (error) {

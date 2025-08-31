@@ -1,8 +1,20 @@
+import { processAttachments, ImageData } from "../lib/image-utils";
+
 export async function generateLegalResponse(userInput: string, attachments?: File[]): Promise<string> {
   const startTime = Date.now();
 
   try {
-    const attachmentInfo = attachments ? attachments.map(f => ({ name: f.name, size: f.size, type: f.type })) : [];
+    let images: ImageData[] = [];
+    let otherFiles: { name: string; size: number; type: string }[] = [];
+    
+    // Process attachments to separate images from other files
+    if (attachments && attachments.length > 0) {
+      const processed = await processAttachments(attachments);
+      images = processed.images;
+      otherFiles = processed.otherFiles;
+      
+      console.log(`Processed ${images.length} image(s) and ${otherFiles.length} other file(s)`);
+    }
     
     const response = await fetch('/api/chat', {
       method: 'POST',
@@ -11,7 +23,8 @@ export async function generateLegalResponse(userInput: string, attachments?: Fil
       },
       body: JSON.stringify({
         userInput,
-        attachments: attachmentInfo,
+        images,
+        attachments: otherFiles,
       }),
     });
 
@@ -28,7 +41,7 @@ export async function generateLegalResponse(userInput: string, attachments?: Fil
     const endTime = Date.now();
     const executionTime = (endTime - startTime) / 1000;
     
-    console.log(`AI Response generated in ${executionTime.toFixed(2)} seconds`);
+    console.log(`AI Response generated in ${executionTime.toFixed(2)} seconds using ${data.model_used || 'unknown model'}`);
     
     return data.response;
   } catch (error) {
