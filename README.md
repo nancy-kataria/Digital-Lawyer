@@ -87,9 +87,7 @@ Digital Lawyer is a **privacy-first AI legal assistant** designed to provide leg
    http://localhost:3000
    ```
 
-## Configuration
-
-### Deployment Modes
+## Deployment Modes
 
 #### Local Development (Offline)
 - Uses local Ollama installation
@@ -131,36 +129,6 @@ Digital Lawyer is a **privacy-first AI legal assistant** designed to provide leg
 - **Languages**: Primarily English (expandable)
 - **Accuracy**: Continuously improving with model updates
 
-## Architecture
-
-### Tech Stack
-- **Frontend**: Next.js 15 with React 19
-- **Styling**: Tailwind CSS with custom components
-- **AI Backend**: Ollama with local model execution
-- **TypeScript**: Type safety throughout
-- **Build Tool**: Turbopack for fast development
-
-### Project Structure
-```
-digital-lawyer/
-├── app/                    # Next.js app router
-│   ├── api/chat/          # AI chat API endpoint
-│   └── page.tsx           # Main application page
-├── components/            # React components
-│   ├── chat-interface.tsx # Main chat interface
-│   └── ui/               # Reusable UI components
-├── lib/                  # Core logic
-│   ├── model-orchestrator.ts    # AI model coordination
-│   ├── model-config.ts          # Provider configuration
-│   ├── image-utils.ts           # Image processing
-│   └── model-providers/         # Provider implementations
-├── models/               # AI response generation
-├── scripts/              # Setup and utility scripts
-├── hooks/                # React hooks
-└── types/                # TypeScript definitions
-```
-
-
 ## Usage Guide
 
 ### Basic Legal Consultation
@@ -178,30 +146,6 @@ digital-lawyer/
 - "Can you analyze this lease agreement for any red flags?"
 - "What are my rights in this situation?"
 - "Help me understand this legal document"
-
-## Development
-
-### Scripts
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run setup-models # Check model configuration
-```
-
-### Adding New Features
-1. **UI Components**: Add to `components/` directory
-2. **API Endpoints**: Create in `app/api/` directory
-3. **AI Logic**: Extend `lib/model-orchestrator.ts`
-4. **Styling**: Use Tailwind CSS classes
-
-### Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
 
 ## System Requirements
 
@@ -221,28 +165,6 @@ npm run setup-models # Check model configuration
 - Consider using smaller models or remote Ollama setup
 - Web interface works on tablets and smartphones
 - Progressive Web App (PWA) support planned
-
-## Important Legal Disclaimers
-
-### Legal Advice Disclaimer
-**This application provides general legal information only and does not constitute legal advice.** 
-
-- **Not a Substitute**: This AI cannot replace qualified legal counsel
-- **Seek Professional Help**: Always consult with a licensed attorney for specific legal matters
-- **Jurisdiction Matters**: Laws vary by location and change frequently
-- **Time Sensitivity**: Legal advice can be time-sensitive
-
-### Privacy Statement
-- Your conversations are processed locally on your device
-- No data is transmitted to external servers (in local mode)
-- No chat history is stored or logged
-- You maintain full control over your data
-
-### Security Notice
-- This software is provided "as is" without warranties
-- Users are responsible for their own data security
-- Regular security updates are recommended
-- Report security issues responsibly
 
 ---
 
