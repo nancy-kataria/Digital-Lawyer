@@ -30,8 +30,17 @@ export async function POST(request: NextRequest) {
     // Check model configuration and availability
     const config = getModelConfig();
     console.log(`API: Using provider ${config.provider}`);
+    console.log('API: Full config:', JSON.stringify(config, null, 2));
+    console.log('API: Environment check:', {
+      NODE_ENV: process.env.NODE_ENV,
+      VERCEL: process.env.VERCEL,
+      NETLIFY: process.env.NETLIFY,
+      OLLAMA_API_URL: !!process.env.OLLAMA_API_URL,
+      MODEL_PROVIDER: process.env.MODEL_PROVIDER
+    });
     
     if (!isProviderConfigured(config)) {
+      console.error(`API: Provider ${config.provider} is not configured`);
       return NextResponse.json(
         { 
           success: false, 

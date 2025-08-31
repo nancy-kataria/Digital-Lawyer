@@ -23,6 +23,13 @@ export async function createFallbackProvider(): Promise<BaseModelProvider> {
   
   try {
     const primaryProvider = createModelProvider(config);
+    
+    // Mock provider doesn't need availability checking or fallback
+    if (config.provider === 'mock') {
+      console.log('Using mock provider (no availability check needed)');
+      return primaryProvider;
+    }
+    
     const availability = await primaryProvider.checkAvailability();
     
     // If primary provider is not available, try fallback

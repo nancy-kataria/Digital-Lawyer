@@ -1,5 +1,6 @@
 import { ImageData } from "./image-utils";
-import { createFallbackProvider } from "./model-providers/provider-factory";
+import { createModelProvider, createFallbackProvider } from "./model-providers/provider-factory";
+import { getModelConfig } from "./model-config";
 import { BaseModelProvider, ModelMessage } from "./model-providers/base-provider";
 
 export interface ModelResponse {
@@ -14,7 +15,11 @@ let currentProvider: BaseModelProvider | null = null;
 
 async function getProvider(): Promise<BaseModelProvider> {
   if (!currentProvider) {
+    console.log('Orchestrator: Creating provider for the first time');
+    const config = getModelConfig();
+    console.log('Orchestrator: Config selected:', JSON.stringify(config, null, 2));
     currentProvider = await createFallbackProvider();
+    console.log('Orchestrator: Provider created:', currentProvider.name);
   }
   return currentProvider;
 }

@@ -21,12 +21,17 @@ export class MockProvider extends BaseModelProvider {
   }
 
   async generateText(messages: ModelMessage[]): Promise<ModelResponse> {
+    console.log('Mock provider: generateText called with messages:', messages.length);
+    
     // Simulate processing time
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
 
     try {
       const userMessage = messages.find(m => m.role === 'user')?.content || '';
+      console.log('Mock provider: processing user message:', userMessage.substring(0, 100) + '...');
+      
       const response = this.generateMockLegalResponse(userMessage);
+      console.log('Mock provider: generated response length:', response.length);
 
       return {
         success: true,
@@ -34,6 +39,7 @@ export class MockProvider extends BaseModelProvider {
         model_used: `${this.config.textModel} (Mock Demo)`
       };
     } catch (error) {
+      console.error('Mock provider: Error in generateText:', error);
       return {
         success: false,
         error: `Mock text generation failed: ${error}`,
