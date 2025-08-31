@@ -1,6 +1,6 @@
-# 🏛️ Digital Lawyer
+# Digital Lawyer
 
-> A privacy-first AI legal assistant that runs entirely on your device
+A privacy-first AI legal assistant that runs entirely on your device
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.5-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
