@@ -13,15 +13,8 @@ export class OllamaProvider extends BaseModelProvider {
     this.config = config;
     this.name = config.description;
     
-    // Configure Ollama client for local or remote
-    if (config.provider === 'ollama-remote' && config.apiUrl) {
-      // For remote Ollama, we'll use the same client but with different host
-      // The ollama library will handle the host configuration internally
-      this.ollamaClient = ollama;
-    } else {
-      // Use default local Ollama client
-      this.ollamaClient = ollama;
-    }
+    // Use local Ollama client only
+    this.ollamaClient = ollama;
   }
 
   async checkAvailability(): Promise<ModelAvailability> {
@@ -41,21 +34,14 @@ export class OllamaProvider extends BaseModelProvider {
       );
       
       if (!visionModel) {
-        const pullCmd = this.config.provider === 'ollama-local' 
-          ? "ollama pull llava:7b"
-          : "Pull llava:7b on your remote Ollama instance";
-        errors.push(`LLaVA:7b model not found. ${pullCmd}`);
+        errors.push(`LLaVA:7b model not found. Run: ollama pull llava:7b`);
       }
       if (!textModel) {
-        const pullCmd = this.config.provider === 'ollama-local'
-          ? "ollama pull gemma3:4b" 
-          : "Pull gemma3:4b on your remote Ollama instance";
-        errors.push(`Gemma3:4b model not found. ${pullCmd}`);
+        errors.push(`Gemma3:4b model not found. Run: ollama pull gemma3:4b`);
       }
       
     } catch (error) {
-      const location = this.config.provider === 'ollama-local' ? 'local' : `remote (${this.config.apiUrl})`;
-      errors.push(`Failed to connect to ${location} Ollama instance: ${error}`);
+      errors.push(`Failed to connect to local Ollama instance: ${error}`);
     }
     
     return { textModel, visionModel, errors };

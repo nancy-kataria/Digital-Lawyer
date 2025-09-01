@@ -19,10 +19,6 @@ async function setupModels() {
     if (provider === 'ollama-local') {
       console.log("   Local Ollama provider selected but may not be running.");
       console.log("   Make sure Ollama is installed and running: ollama serve");
-    } else if (provider === 'ollama-remote') {
-      console.log(`   Remote Ollama provider selected but URL not configured.`);
-      console.log("   Set OLLAMA_API_URL in your environment variables.");
-      console.log("   See .env.example for configuration examples.\n");
     }
   }
   
@@ -42,15 +38,10 @@ async function setupModels() {
       }
       console.log("\n   After installation, restart your development server:");
       console.log("   npm run dev");
-    } else if (provider === 'ollama-remote') {
-      console.log("\n💡 For remote Ollama:");
-      console.log("   - Verify your remote Ollama server is running");
-      console.log("   - Check that models are installed on the remote server");
-      console.log("   - Ensure network connectivity to the remote server");
     }
     
     console.log("\n🔄 Fallback System:");
-    console.log("   The app will automatically try alternative Ollama instances if available.");
+    console.log("   The app will automatically fallback to mock provider if Ollama is not available.");
     
   } else {
     console.log("✅ All models are available! Your multimodal system is ready.");

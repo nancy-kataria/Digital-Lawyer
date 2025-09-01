@@ -1,4 +1,4 @@
-export type ModelProvider = 'ollama-local' | 'ollama-remote' | 'mock';
+export type ModelProvider = 'ollama-local' | 'mock';
 
 export interface ModelConfig {
   provider: ModelProvider;
@@ -20,13 +20,6 @@ export const PROVIDER_CONFIGS: ProviderConfig = {
     visionModel: 'llava:7b',
     description: 'Local Ollama instance'
   },
-  'ollama-remote': {
-    provider: 'ollama-remote',
-    textModel: 'gemma3:4b',
-    visionModel: 'llava:7b',
-    apiUrl: process.env.OLLAMA_API_URL || 'http://localhost:11434',
-    description: 'Remote Ollama instance'
-  },
   'mock': {
     provider: 'mock',
     textModel: 'Mock Legal AI',
@@ -37,9 +30,6 @@ export const PROVIDER_CONFIGS: ProviderConfig = {
 
 // Environment-based provider selection
 export function getModelProvider(): ModelProvider {
-  // Check if remote Ollama URL is provided
-  const remoteOllamaUrl = process.env.OLLAMA_API_URL;
-  
   // Check if we're in a hosted environment (Vercel, Netlify, etc.)
   const isHosted = process.env.VERCEL || 
                    process.env.NETLIFY || 
@@ -51,12 +41,7 @@ export function getModelProvider(): ModelProvider {
     return manualProvider;
   }
   
-  // Use remote Ollama if URL is explicitly provided
-  if (remoteOllamaUrl) {
-    return 'ollama-remote';
-  }
-  
-  // Use mock mode for hosted environments without remote Ollama
+  // Use mock mode for hosted environments
   if (isHosted) {
     return 'mock';
   }
@@ -69,11 +54,6 @@ export function getModelConfig(): ModelConfig {
   const provider = getModelProvider();
   const config = { ...PROVIDER_CONFIGS[provider] };
   
-  // Update remote URL if provided in environment
-  if (provider === 'ollama-remote' && process.env.OLLAMA_API_URL) {
-    config.apiUrl = process.env.OLLAMA_API_URL;
-  }
-  
   return config;
 }
 
@@ -82,11 +62,6 @@ export function isProviderConfigured(config: ModelConfig): boolean {
   // Local Ollama doesn't need special configuration
   if (config.provider === 'ollama-local') {
     return true;
-  }
-  
-  // Remote Ollama needs a URL
-  if (config.provider === 'ollama-remote') {
-    return !!config.apiUrl;
   }
   
   // Mock provider is always configured

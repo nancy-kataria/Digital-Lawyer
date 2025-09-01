@@ -35,7 +35,6 @@ export async function POST(request: NextRequest) {
       NODE_ENV: process.env.NODE_ENV,
       VERCEL: process.env.VERCEL,
       NETLIFY: process.env.NETLIFY,
-      OLLAMA_API_URL: !!process.env.OLLAMA_API_URL,
       MODEL_PROVIDER: process.env.MODEL_PROVIDER
     });
     

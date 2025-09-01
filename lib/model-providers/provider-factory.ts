@@ -8,7 +8,6 @@ export function createModelProvider(config?: ModelConfig): BaseModelProvider {
   
   switch (modelConfig.provider) {
     case 'ollama-local':
-    case 'ollama-remote':
       return new OllamaProvider(modelConfig);
     case 'mock':
       return new MockProvider(modelConfig);
@@ -17,45 +16,34 @@ export function createModelProvider(config?: ModelConfig): BaseModelProvider {
   }
 }
 
-// Fallback logic - try remote Ollama if local fails, or vice versa
 export async function createFallbackProvider(): Promise<BaseModelProvider> {
   const config = getModelConfig();
   
   try {
     const primaryProvider = createModelProvider(config);
     
-    // Mock provider doesn't need availability checking or fallback
     if (config.provider === 'mock') {
-      console.log('Using mock provider (no availability check needed)');
+      console.log('Using mock provider');
       return primaryProvider;
     }
     
-    const availability = await primaryProvider.checkAvailability();
-    
-    // If primary provider is not available, try fallback
-    if (availability.errors.length > 0) {
-      console.warn(`Primary provider ${config.provider} not available:`, availability.errors);
+    if (config.provider === 'ollama-local') {
+      const availability = await primaryProvider.checkAvailability();
       
-      // Switch between local and remote Ollama
-      const fallbackProvider = config.provider === 'ollama-local' ? 'ollama-remote' : 'ollama-local';
-      
-      // Only attempt fallback if the fallback provider is configured
-      if (fallbackProvider === 'ollama-remote' && !process.env.OLLAMA_API_URL) {
-        console.warn("Cannot fallback to remote Ollama: OLLAMA_API_URL not configured");
-        return primaryProvider; // Return primary even if it has issues
+      // If ollama-local has issues, fallback to mock
+      if (availability.errors.length > 0) {
+        console.warn(`Ollama local not available:`, availability.errors);
+        console.log('Falling back to mock provider');
+        
+        const mockConfig: ModelConfig = {
+          provider: 'mock',
+          textModel: 'Mock Legal AI',
+          visionModel: 'Mock Vision AI',
+          description: 'Mock AI for demo/testing'
+        };
+        
+        return createModelProvider(mockConfig);
       }
-      
-      const fallbackConfig: ModelConfig = { 
-        ...config, 
-        provider: fallbackProvider,
-        description: fallbackProvider === 'ollama-local' ? 'Local Ollama instance' : 'Remote Ollama instance',
-        apiUrl: fallbackProvider === 'ollama-remote' 
-          ? (process.env.OLLAMA_API_URL || 'http://localhost:11434')
-          : undefined
-      };
-      
-      console.log(`Attempting fallback to ${fallbackProvider}`);
-      return createModelProvider(fallbackConfig);
     }
     
     return primaryProvider;

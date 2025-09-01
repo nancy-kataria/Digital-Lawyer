@@ -43,7 +43,7 @@ Digital Lawyer is a **privacy-first AI legal assistant** designed to provide leg
 ### Technical Features
 - **Responsive Design**: Works on desktop, tablet, and mobile
 - **Fast Performance**: Optimized for low-resource devices
-- **Hybrid Deployment**: Supports both local and remote Ollama instances
+- **Local Processing**: Uses local Ollama instances for maximum privacy
 - **Modern UI**: Clean, professional interface built with Tailwind CSS
 - **Accessible**: Following web accessibility best practices
 
@@ -87,19 +87,14 @@ Digital Lawyer is a **privacy-first AI legal assistant** designed to provide leg
    http://localhost:3000
    ```
 
-## Deployment Modes
+## Deployment Mode
 
-#### Local Development (Offline)
-- Uses local Ollama installation
-- Models run on your machine
-- No internet required after setup
+#### Local Processing (Offline)
+- Uses local Ollama installation only
+- Models run entirely on your machine
+- No internet required after initial setup
 - Maximum privacy and security
-
-#### Cloud Deployment (Online)
-- Connects to remote Ollama server
-- Users don't download models
-- Requires remote Ollama instance
-- Maintains same privacy (your server)
+- Complete data sovereignty
 
 ## AI Models
 
@@ -162,7 +157,7 @@ Digital Lawyer is a **privacy-first AI legal assistant** designed to provide leg
 - **Network**: For initial model downloads
 
 ### Mobile/Low-Resource Devices
-- Consider using smaller models or remote Ollama setup
+- Consider using smaller models for better performance
 - Web interface works on tablets and smartphones
 - Progressive Web App (PWA) support planned
 
