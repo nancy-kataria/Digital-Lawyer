@@ -62,16 +62,36 @@ export function IncidentCapture({ onBack }: IncidentCaptureProps) {
 
   // Initialize camera and microphone
   useEffect(() => {
+    let currentStream: MediaStream | null = null
+
     const initializeMedia = async () => {
       try {
         const mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" }, // Use back camera for incidents
-          audio: true,
+          video: {
+            facingMode: "environment",
+            width: { ideal: 1280, max: 1920 },
+            height: { ideal: 720, max: 1080 },
+            frameRate: { ideal: 30, max: 60 },
+            aspectRatio: 16/9
+          },
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            sampleRate: 44100
+          },
         })
 
+        currentStream = mediaStream
         setStream(mediaStream)
+        
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream
+          // Wait for metadata to load before setting up video
+          videoRef.current.onloadedmetadata = () => {
+            if (videoRef.current) {
+              videoRef.current.play().catch(console.error)
+            }
+          }
         }
       } catch (error) {
         console.error("Error accessing media devices:", error)
@@ -86,11 +106,11 @@ export function IncidentCapture({ onBack }: IncidentCaptureProps) {
     initializeMedia()
 
     return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop())
+      if (currentStream) {
+        currentStream.getTracks().forEach((track) => track.stop())
       }
     }
-  }, [stream, toast])
+  }, [toast])
 
   // Initialize speech recognition
   useEffect(() => {
@@ -338,7 +358,19 @@ export function IncidentCapture({ onBack }: IncidentCaptureProps) {
           <Card>
             <CardContent className="p-0">
               <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-                <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover" />
+                <video 
+                  ref={videoRef} 
+                  autoPlay 
+                  muted 
+                  playsInline 
+                  className="w-full h-full object-cover"
+                  style={{
+                    transform: 'translateZ(0)',
+                    backfaceVisibility: 'hidden',
+                    perspective: '1000px',
+                    willChange: 'transform'
+                  }}
+                />
 
                 {/* Recording Indicator */}
                 {isRecording && (
