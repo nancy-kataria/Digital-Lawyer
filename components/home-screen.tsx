@@ -90,7 +90,7 @@ export function HomeScreen() {
                 Welcome to Digital Lawyer
               </h2>
               <p className="text-xl md:text-2xl text-muted-foreground text-pretty max-w-2xl mx-auto leading-relaxed">
-                I am your digital legal help provider. How may I help you today?
+                Your Private, On-Device AI Legal Assistant
               </p>
             </div>
 
@@ -172,10 +172,13 @@ export function HomeScreen() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-pretty text-base leading-relaxed">
-                  Record incidents in real-time with video and audio. Get immediate AI guidance and emergency assistance
-                  when you need it most.
+                  Record incidents in real-time with video and audio. Get immediate AI guidance.
                 </CardDescription>
                 <div className="space-y-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
+                    <span>Coming Soon</span>
+                  </div>
                   <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
                     <span>Real-time video recording</span>
@@ -190,7 +193,7 @@ export function HomeScreen() {
                   </div>
                 </div>
                 <Button className="w-full mt-6 bg-accent hover:bg-accent/90 text-accent-foreground" size="lg">
-                  Start Recording
+                  Try the Demo
                 </Button>
               </CardContent>
             </Card>
