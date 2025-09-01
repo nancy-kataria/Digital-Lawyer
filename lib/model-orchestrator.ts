@@ -10,7 +10,6 @@ export interface ModelResponse {
   model_used?: string;
 }
 
-// Global provider instance - initialized once per request
 let currentProvider: BaseModelProvider | null = null;
 
 async function getProvider(): Promise<BaseModelProvider> {
@@ -87,7 +86,6 @@ export async function generateResponseWithProvider(
   }
 }
 
-// Legacy function names for backward compatibility
 export const analyzeImageWithLLaVA = analyzeImageWithProvider;
 export const generateResponseWithGemma = generateResponseWithProvider;
 

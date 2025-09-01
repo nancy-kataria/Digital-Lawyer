@@ -10,10 +10,10 @@ interface AIResponseProps {
 export function AIResponse({ content, className }: AIResponseProps) {
   return (
     <div className={cn("max-w-none", className)}>
+      {/* Formatting for AI responses */}
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          // Headings - optimized for chat bubbles
           h1: (props) => (
             <h1 className="text-lg font-bold mb-3 mt-2 first:mt-0" {...props} />
           ),
@@ -27,12 +27,10 @@ export function AIResponse({ content, className }: AIResponseProps) {
             <h4 className="text-sm font-medium mb-1 mt-2 first:mt-0" {...props} />
           ),
           
-          // Paragraphs
           p: (props) => (
             <p className="text-gray-700 mb-3 leading-relaxed" {...props} />
           ),
           
-          // Lists
           ul: (props) => (
             <ul className="list-disc pl-5 mb-4 space-y-1" {...props} />
           ),
@@ -42,8 +40,7 @@ export function AIResponse({ content, className }: AIResponseProps) {
           li: (props) => (
             <li className="text-gray-700 leading-relaxed" {...props} />
           ),
-          
-          // Text formatting
+        
           strong: (props) => (
             <strong className="font-semibold text-gray-900" {...props} />
           ),
@@ -51,7 +48,6 @@ export function AIResponse({ content, className }: AIResponseProps) {
             <em className="italic text-gray-800" {...props} />
           ),
           
-          // Code
           code: ({ ...props }) => {
             // Type assertion to access the inline property safely
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,7 +71,6 @@ export function AIResponse({ content, className }: AIResponseProps) {
             <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4" {...props} />
           ),
           
-          // Links
           a: (props) => (
             <a 
               className="text-blue-600 hover:text-blue-800 underline" 
@@ -85,7 +80,6 @@ export function AIResponse({ content, className }: AIResponseProps) {
             />
           ),
           
-          // Blockquotes
           blockquote: (props) => (
             <blockquote 
               className="border-l-4 border-blue-500 pl-4 italic text-gray-600 my-4 bg-blue-50 py-2" 
@@ -93,7 +87,6 @@ export function AIResponse({ content, className }: AIResponseProps) {
             />
           ),
           
-          // Tables (if needed)
           table: (props) => (
             <div className="overflow-x-auto mb-4">
               <table className="min-w-full border-collapse border border-gray-300" {...props} />
@@ -106,7 +99,6 @@ export function AIResponse({ content, className }: AIResponseProps) {
             <td className="border border-gray-300 px-3 py-2" {...props} />
           ),
           
-          // Horizontal rule
           hr: (props) => (
             <hr className="my-6 border-gray-300" {...props} />
           ),

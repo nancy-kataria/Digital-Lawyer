@@ -30,7 +30,6 @@ export async function createFallbackProvider(): Promise<BaseModelProvider> {
     if (config.provider === 'ollama-local') {
       const availability = await primaryProvider.checkAvailability();
       
-      // If ollama-local has issues, fallback to mock
       if (availability.errors.length > 0) {
         console.warn(`Ollama local not available:`, availability.errors);
         console.log('Falling back to mock provider');

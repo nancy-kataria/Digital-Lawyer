@@ -7,7 +7,6 @@ export async function generateLegalResponse(userInput: string, attachments?: Fil
     let images: ImageData[] = [];
     let otherFiles: { name: string; size: number; type: string }[] = [];
     
-    // Process attachments to separate images from other files
     if (attachments && attachments.length > 0) {
       const processed = await processAttachments(attachments);
       images = processed.images;

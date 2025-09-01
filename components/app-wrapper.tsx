@@ -10,7 +10,6 @@ type AppState = "permissions" | "disclaimer" | "home"
 export function AppWrapper() {
   const [appState, setAppState] = useState<AppState>("permissions")
 
-  // Check if permissions were previously granted
   useEffect(() => {
     const checkPermissions = async () => {
       try {
@@ -18,7 +17,6 @@ export function AppWrapper() {
         const micPermissionStatus = await navigator.permissions.query({ name: "microphone" as PermissionName })
 
         if (permissionStatus.state === "granted" && micPermissionStatus.state === "granted") {
-          // Check if disclaimer was accepted
           const disclaimerAccepted = localStorage.getItem("digital-lawyer-disclaimer-accepted")
           if (disclaimerAccepted) {
             setAppState("home")
@@ -27,7 +25,6 @@ export function AppWrapper() {
           }
         }
       } catch (error) {
-        // Permissions API not supported, start from permissions screen
         console.log("Permissions API not supported", error)
       }
     }

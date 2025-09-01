@@ -17,7 +17,7 @@ export async function fileToBase64(file: File): Promise<string> {
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === 'string') {
-        // Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
+        // Removing the data URL prefix (e.g., "data:image/jpeg;base64,")
         const base64 = reader.result.split(',')[1];
         resolve(base64);
       } else {

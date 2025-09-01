@@ -52,8 +52,6 @@ export async function POST(request: NextRequest) {
     const modelCheck = await checkModelAvailability();
     if (modelCheck.errors.length > 0) {
       console.warn("Model availability issues:", modelCheck.errors);
-      // For cloud providers, we may still proceed if there are warnings
-      // but fail if no models are available at all
       if (!modelCheck.gemma && !modelCheck.llava) {
         return NextResponse.json(
           { 
@@ -63,8 +61,7 @@ export async function POST(request: NextRequest) {
           { status: 503 }
         );
       }
-      
-      // If we have images but no vision model, inform the user
+    
       if (processedImages.length > 0 && !modelCheck.llava) {
         return NextResponse.json(
           { 

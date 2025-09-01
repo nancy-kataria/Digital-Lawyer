@@ -12,7 +12,6 @@ export class MockProvider extends BaseModelProvider {
   }
 
   async checkAvailability(): Promise<ModelAvailability> {
-    // Mock provider is always available
     return { 
       textModel: true, 
       visionModel: true, 
@@ -49,7 +48,6 @@ export class MockProvider extends BaseModelProvider {
   }
 
   async analyzeImage(imageData: ImageData, prompt: string): Promise<ModelResponse> {
-    // Simulate processing time for image analysis
     await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
 
     try {

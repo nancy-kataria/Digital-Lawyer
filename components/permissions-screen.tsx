@@ -18,13 +18,10 @@ export function PermissionsScreen({ onPermissionsGranted }: PermissionsScreenPro
     setError(null)
 
     try {
-      // Request camera and microphone permissions
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       })
-
-      // Stop the stream immediately as we just needed permissions
       stream.getTracks().forEach((track) => track.stop())
 
       onPermissionsGranted()

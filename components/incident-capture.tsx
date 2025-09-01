@@ -157,7 +157,6 @@ export function IncidentCapture({ onBack }: IncidentCaptureProps) {
       }
 
       recorder.onstop = () => {
-        // Recording chunks can be processed here if needed
         console.log('Recording stopped, chunks:', chunks.length)
       }
 
@@ -171,7 +170,6 @@ export function IncidentCapture({ onBack }: IncidentCaptureProps) {
         setIsListening(true)
       }
 
-      // Add initial AI greeting
       const greeting = "I'm here to help you with this incident. Please describe what's happening."
       addToTranscript(greeting, "ai")
       speakText(greeting)

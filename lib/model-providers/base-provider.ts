@@ -32,8 +32,7 @@ export abstract class BaseModelProvider {
     imageData: ImageData,
     prompt: string
   ): Promise<ModelResponse>;
-  
-  // Helper method to format image for the provider
+
   protected formatImageForProvider(imageData: ImageData): string {
     return imageData.base64;
   }
